@@ -20,8 +20,12 @@ class NodeRelaySession extends EventEmitter {
   }
 
   run() {
+
     let format = this.conf.ouPath.startsWith('rtsp://') ? 'rtsp' : 'flv';
-    let argv = ['-fflags', 'nobuffer', '-i', this.conf.inPath, '-c', 'copy', '-f', format, this.conf.ouPath];
+    //let argv = ['-fflags', 'nobuffer', '-i', this.conf.inPath, '-c', 'copy', '-f', format, this.conf.ouPath];
+    //let argv = ['-fflags', 'nobuffer', '-i', this.conf.inPath, '-c:a', 'copy', '-f', format, this.conf.ouPath]
+    let argv = ["-v", "debug", "-r", "7", "-i", this.conf.inPath, "-framerate","7", "-video_size", "640x360", "-vcodec", "libx264", "-preset", "veryfast", "-maxrate", "750k", "-bufsize", "1500k", "-tune", "zerolatency", "-g", "14", "-an", "-r", "7", "-f", "flv", this.conf.ouPath]
+    
     if (this.conf.inPath[0] === '/' || this.conf.inPath[1] === ':') {
       argv.unshift('-1');
       argv.unshift('-stream_loop');
@@ -35,7 +39,7 @@ class NodeRelaySession extends EventEmitter {
       }
     }
 
-    Logger.ffdebug(argv.toString());
+    Logger.ffdebug(argv.toString());  
     this.ffmpeg_exec = spawn(this.conf.ffmpeg, argv);
     this.ffmpeg_exec.on('error', (e) => {
       Logger.ffdebug(e);
